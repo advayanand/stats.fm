@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Chart, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-import { Scrobble } from "../utils/types";
+import { Record, Scrobble } from "../utils/types";
 import { topArtists } from "../data/data";
-import { TimeRange } from "../utils/types";
-import { get_top_artists } from "../controllers/lastfm";
+import { TimeRange, RecordType } from "../utils/types";
+import { get_top_albums, get_top_artists, get_top_tracks } from "../controllers/lastfm";
 
 Chart.register(...registerables);
 
@@ -76,6 +76,8 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
     // const [ data, setData ] = useState<Map<string, number[]>>(new Map());
     // const [ labels, setLabels ] = useState<number[]>([]);
     const [ timeRange, setTimeRange ] = useState<TimeRange>(TimeRange.ALL_TIME);
+    const [ recordType, setRecordType ] = useState<RecordType>(RecordType.ARTISTS);
+    const [ top, setTop ] = useState<string[]>([]);
 
     // useEffect(() => {
     //     const res = calculateLineGraphData(props.scrobbles, TimeRange.ALL_TIME);
@@ -84,7 +86,24 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
     //     setLoading(false);
     // }, []);
 
-    const topArtists = get_top_artists(props.username, timeRange);
+    useEffect(() => {
+        const fetchTop = async () => {
+            let top: Record[] = [];
+            if (recordType === RecordType.ARTISTS)
+                top = await get_top_artists(props.username, timeRange);
+            else if (recordType === RecordType.ALBUMS)
+                top = await get_top_albums(props.username, timeRange);
+            else if (recordType === RecordType.TRACKS)
+                top = await get_top_tracks(props.username, timeRange);
+            setTop(top.slice(0, 10).map(obj => obj.name));
+        }
+
+        fetchTop()
+        .catch(err => {
+            console.log(err, "Error fetching top");
+        });
+    }, [recordType]);
+
     const lineGraphData = calculateLineGraphData(props.scrobbles, timeRange);
     // setLoading(false);
 

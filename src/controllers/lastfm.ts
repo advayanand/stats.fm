@@ -82,7 +82,9 @@ const get_all_scrobbles = async (username: string, pageLoadCallback: Function, t
 
 export {
     get_all_scrobbles,
-    get_top_artists
+    get_top_artists,
+    get_top_albums,
+    get_top_tracks
 };
 
 // export type Scrobble;

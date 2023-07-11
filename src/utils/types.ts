@@ -4,7 +4,7 @@ export interface Scrobble {
         "#text": string
     },
     streamable: string,
-    image: Array<Object>
+    image: Object[]
     mbid: string,
     album: {
         mbid: string,
@@ -21,6 +21,31 @@ export interface Scrobble {
     }
 }
 
+export interface Record {
+    artist: {
+        mbid: string,
+        "#text": string,
+        url?: string
+    },
+    image: Object[]
+    mbid: string,
+    album: {
+        mbid: string,
+        "#text": string
+    },
+    name: string,
+    url: string,
+    date: {
+        uts: string,
+        "#text": string
+    },
+    playcount: string
+    "@attr"?: {
+        rank: string
+    },
+    streamable?: string | Object,
+}
+
 export enum TimeRange {
     ALL_TIME,
     YEAR,
@@ -28,4 +53,10 @@ export enum TimeRange {
     QUARTER,
     ONE_MONTH,
     ONE_WEEK,
+}
+
+export enum RecordType {
+    ARTISTS,
+    ALBUMS,
+    TRACKS,
 }
