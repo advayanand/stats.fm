@@ -24,15 +24,15 @@ const timeRangeAmounts: Map<TimeRange, number> = new Map([
     [TimeRange.ALL_TIME, 0]
 ]);
 
-const calculateLineGraphData = (scrobbles: Scrobble[], timeRange: TimeRange) => {
+const calculateLineGraphData = (scrobbles: Scrobble[], top: string[], recordType: RecordType, timeRange: TimeRange) => {
     if (scrobbles.length === 0) return {labels: [], data: new Map()}
     // let data = [];
     let timestamps = [];
     let map = new Map();
     let data: Map<string, number[]> = new Map();
-    for (const artist of topArtists) {
-        map.set(artist, 0);
-        data.set(artist, []);
+    for (const record of top) {
+        map.set(record, 0);
+        data.set(record, []);
     }
     const presentDate = parseInt(scrobbles[0].date.uts);
     const reverseScrobbles = [...scrobbles];
@@ -42,19 +42,23 @@ const calculateLineGraphData = (scrobbles: Scrobble[], timeRange: TimeRange) => 
         (presentDate - timeRangeAmounts.get(timeRange)!);
     timestamps.push(startingDate);
     const timeInterval = Math.floor((presentDate - startingDate) / 30);
-    for (let [ artist, playCount ] of map.entries())
-        data.get(artist)?.push(playCount)
+    for (let [ record, playCount ] of map.entries())
+        data.get(record)?.push(playCount)
     let curDateTarget = startingDate + timeInterval;
     
     for (let i = 0; i < reverseScrobbles.length; i++) {
         if (parseInt(reverseScrobbles[i].date.uts) > curDateTarget) {
-            for (let [ artist, playCount ] of map.entries())
-                data.get(artist)?.push(playCount)
+            for (let [ record, playCount ] of map.entries())
+                data.get(record)?.push(playCount)
             timestamps.push(curDateTarget);
             curDateTarget = Math.min(curDateTarget + timeInterval, presentDate);
         }
-        if (map.has(reverseScrobbles[i].artist["#text"]))
+        if (recordType === RecordType.ARTISTS && map.has(reverseScrobbles[i].artist["#text"]))
             map.set(reverseScrobbles[i].artist["#text"], map.get(reverseScrobbles[i].artist["#text"]) + 1);
+        else if (recordType === RecordType.ALBUMS && map.has(reverseScrobbles[i].album["#text"]))
+            map.set(reverseScrobbles[i].album["#text"], map.get(reverseScrobbles[i].album["#text"]) + 1);
+        else if (recordType === RecordType.TRACKS && map.has(reverseScrobbles[i].name))
+            map.set(reverseScrobbles[i].name, map.get(reverseScrobbles[i].name) + 1);
     }
 
     console.log(timestamps, data);
@@ -104,7 +108,7 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
         });
     }, [recordType]);
 
-    const lineGraphData = calculateLineGraphData(props.scrobbles, timeRange);
+    const lineGraphData = calculateLineGraphData(props.scrobbles, top, recordType, timeRange);
     // setLoading(false);
 
     // if (isLoading) return null;
