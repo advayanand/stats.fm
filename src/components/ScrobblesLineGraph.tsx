@@ -84,7 +84,7 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
     //     setLoading(false);
     // }, []);
 
-    // const topArtists = get_top_artists(props.username, )
+    const topArtists = get_top_artists(props.username, timeRange);
     const lineGraphData = calculateLineGraphData(props.scrobbles, timeRange);
     // setLoading(false);
 
