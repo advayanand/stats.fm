@@ -124,10 +124,10 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
             <Line
                 data={{
                     labels: lineGraphData.labels.map(timestamp => new Date(timestamp * 1000).toDateString()),
-                    datasets: topArtists.map(artist => {
+                    datasets: top.map(record => {
                         return {
-                            data: lineGraphData.data.get(artist),
-                            label: artist
+                            data: lineGraphData.data.get(record),
+                            label: record
                         }
                     })
                 }}
