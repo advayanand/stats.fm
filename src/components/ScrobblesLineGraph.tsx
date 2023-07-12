@@ -93,12 +93,18 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
     useEffect(() => {
         const fetchTop = async () => {
             let top: Record[] = [];
-            if (recordType === RecordType.ARTISTS)
-                top = await get_top_artists(props.username, timeRange);
-            else if (recordType === RecordType.ALBUMS)
-                top = await get_top_albums(props.username, timeRange);
-            else if (recordType === RecordType.TRACKS)
-                top = await get_top_tracks(props.username, timeRange);
+            if (recordType === RecordType.ARTISTS) { 
+                const data = await get_top_artists(props.username, timeRange);
+                top = data.topartists.artist;
+            }
+            else if (recordType === RecordType.ALBUMS) {
+                const data = await get_top_albums(props.username, timeRange);
+                top = data.topalbums.album;
+            }
+            else if (recordType === RecordType.TRACKS) {
+                const data = await get_top_tracks(props.username, timeRange);
+                top = data.toptracks.track;
+            }
             setTop(top.slice(0, 10).map(obj => obj.name));
         }
 

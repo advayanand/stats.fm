@@ -5,28 +5,29 @@ import axios, { all } from "axios";
 import { Scrobble } from "../utils/types";
 import { TimeRange } from "../utils/types";
 import { timeRangePeriodStr } from "../utils/utils";
+import { secrets } from "../secrets/secrets";
 
 const get_top_artists = async (username: string, period: TimeRange) => {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=fyreblaze&api_key=${process.env.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
+    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=fyreblaze&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
     const res = await axios.get(url);
     return res.data;
 }
 
 const get_top_albums = async (username: string, period: TimeRange) => {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fyreblaze&api_key=${process.env.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
+    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fyreblaze&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
     const res = await axios.get(url);
     return res.data;
 }
 
 const get_top_tracks = async (username: string, period: TimeRange) => {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=fyreblaze&api_key=${process.env.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
+    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=fyreblaze&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
     const res = await axios.get(url);
     return res.data;
 }
 
 const get_all_scrobbles_page = async (username: string, page: number) => {
     const url = `https://us-east4-statsfm-391801.cloudfunctions.net/get_scrobbles?username=${username}&page=${page}`;
-    const url2 = `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_API_KEY}&format=json&page=${page}&limit=200`;
+    const url2 = `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${secrets.LASTFM_API_KEY}&format=json&page=${page}&limit=200`;
     const res = await axios.get(url);
     return res.data;
 }
