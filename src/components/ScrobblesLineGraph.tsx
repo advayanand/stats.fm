@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Chart, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
-
 import { Record, Scrobble } from "../utils/types";
 import { topArtists } from "../data/data";
 import { TimeRange, RecordType } from "../utils/types";
 import { get_top_albums, get_top_artists, get_top_tracks } from "../controllers/lastfm";
+import { Select, Skeleton } from "@chakra-ui/react";
 
 Chart.register(...registerables);
 
@@ -22,6 +22,21 @@ const timeRangeAmounts: Map<TimeRange, number> = new Map([
     [TimeRange.ONE_MONTH, 2.628e+6],
     [TimeRange.ONE_WEEK, 604800],
     [TimeRange.ALL_TIME, 0]
+]);
+
+const timeRangeMap: Map<string, TimeRange> = new Map([
+    ["All Time", TimeRange.ALL_TIME],
+    ["One Year", TimeRange.YEAR],
+    ["Half Year", TimeRange.HALF_YEAR],
+    ["3 Months", TimeRange.QUARTER],
+    ["1 Month", TimeRange.ONE_MONTH],
+    ["1 Week", TimeRange.ONE_WEEK],
+]);
+
+const recordTypeMap: Map<string, RecordType> = new Map([
+    ["Artists", RecordType.ARTISTS],
+    ["Albums", RecordType.ALBUMS],
+    ["Tracks", RecordType.TRACKS]
 ]);
 
 const calculateLineGraphData = (scrobbles: Scrobble[], top: string[], recordType: RecordType, timeRange: TimeRange) => {
@@ -76,7 +91,7 @@ interface ScrobblesLineGraphData {
 }
 
 export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
-    const [ isLoading, setLoading ] = useState(true);
+    const [ isLoading, setIsLoading ] = useState(true);
     // const [ data, setData ] = useState<Map<string, number[]>>(new Map());
     // const [ labels, setLabels ] = useState<number[]>([]);
     const [ timeRange, setTimeRange ] = useState<TimeRange>(TimeRange.ALL_TIME);
@@ -107,11 +122,12 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
             }
             setTop(top.slice(0, 10).map(obj => obj.name));
         }
-
+        setIsLoading(true);
         fetchTop()
         .catch(err => {
             console.log(err, "Error fetching top");
         });
+        setIsLoading(false);
     }, [recordType]);
 
     const lineGraphData = calculateLineGraphData(props.scrobbles, top, recordType, timeRange);
@@ -121,6 +137,26 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
 
     return (
         <div>
+            <Select
+                onChange={e => setRecordType(recordTypeMap.get(e.target.value)!)}
+                placeholder=""
+            >
+                <option value="Artists">Artists</option>
+                <option value="Albums">Albums</option>
+                <option value="Tracks">Tracks</option>
+            </Select>
+            <Select
+                onChange={e => setTimeRange(timeRangeMap.get(e.target.value)!)}
+
+            >
+                <option value="All Time">All Time</option>
+                <option value="One Year">One Year</option>
+                <option value="Half Year">Half Year</option>
+                <option value="3 Months">3 Months</option>
+                <option value="1 Months">1 Months</option>
+                <option value="1 Week">1 Week</option>
+            </Select>
+            <Skeleton isLoaded={!isLoading}>
             <Line
                 data={{
                     labels: lineGraphData.labels.map(timestamp => new Date(timestamp * 1000).toDateString()),
@@ -132,6 +168,7 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
                     })
                 }}
             />
+            </Skeleton>
         </div>
     )
 }
