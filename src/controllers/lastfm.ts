@@ -8,19 +8,19 @@ import { timeRangePeriodStr } from "../utils/utils";
 import { secrets } from "../secrets/secrets";
 
 const get_top_artists = async (username: string, period: TimeRange) => {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=fyreblaze&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
+    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${username}&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
     const res = await axios.get(url);
     return res.data;
 }
 
 const get_top_albums = async (username: string, period: TimeRange) => {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fyreblaze&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
+    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${username}&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
     const res = await axios.get(url);
     return res.data;
 }
 
 const get_top_tracks = async (username: string, period: TimeRange) => {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=fyreblaze&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
+    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${username}&api_key=${secrets.LASTFM_API_KEY}&period=${timeRangePeriodStr.get(period)}&format=json&page=1`
     const res = await axios.get(url);
     return res.data;
 }
