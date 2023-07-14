@@ -39,6 +39,22 @@ const recordTypeMap: Map<string, RecordType> = new Map([
     ["Tracks", RecordType.TRACKS]
 ]);
 
+const get_start_index = (reverseScrobbles: Scrobble[], target: number) => {
+    let lo = 0;
+    let hi = reverseScrobbles.length;
+    let ans = -1
+    while (lo < hi) {
+        const mid = lo + Math.floor((hi - lo) / 2);
+        if (parseInt(reverseScrobbles[mid].date.uts) <= target) {
+            ans = mid;
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    return ans;
+}
+
 const calculateLineGraphData = (scrobbles: Scrobble[], top: string[], recordType: RecordType, timeRange: TimeRange) => {
     if (scrobbles.length === 0) return {labels: [], data: new Map()}
     // let data = [];
@@ -60,8 +76,8 @@ const calculateLineGraphData = (scrobbles: Scrobble[], top: string[], recordType
     for (let [ record, playCount ] of map.entries())
         data.get(record)?.push(playCount)
     let curDateTarget = startingDate + timeInterval;
-    
-    for (let i = 0; i < reverseScrobbles.length; i++) {
+    let startIndex = get_start_index(reverseScrobbles, startingDate);    
+    for (let i = startIndex; i < reverseScrobbles.length; i++) {        
         if (parseInt(reverseScrobbles[i].date.uts) > curDateTarget) {
             for (let [ record, playCount ] of map.entries())
                 data.get(record)?.push(playCount)
@@ -153,7 +169,7 @@ export const ScrobblesLineGraph = (props: ScrobblesLineGraphProps) => {
                 <option value="One Year">One Year</option>
                 <option value="Half Year">Half Year</option>
                 <option value="3 Months">3 Months</option>
-                <option value="1 Months">1 Months</option>
+                <option value="1 Month">1 Months</option>
                 <option value="1 Week">1 Week</option>
             </Select>
             <Skeleton isLoaded={!isLoading}>
