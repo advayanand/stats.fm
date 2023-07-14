@@ -50,6 +50,15 @@ const extend_scrobbles_list = (allScrobbles: Scrobble[], newScrobbles: Scrobble[
     allScrobbles.push(...newScrobbles)
 }
 
+const retry: (fn: () => Promise<any>, maxRetries: number, err?:any) => Promise<any> = (fn: () => Promise<any>, maxRetries: number, err=null) => {
+    if (maxRetries === 0)
+        return Promise.reject(err);
+    return fn().then(val => Promise.resolve(val)).catch(err => {
+        console.error(`Error fetching page, retrying... (${maxRetries - 1} tries left)`);
+        return retry(fn, maxRetries - 1, err);
+    });
+}
+
 const get_all_scrobbles = async (username: string, pageLoadCallback: Function, totalPagesCallback: Function) => {
     const data = await get_all_scrobbles_page(username, 1);
     const recentTracks = data.recenttracks;
@@ -60,13 +69,15 @@ const get_all_scrobbles = async (username: string, pageLoadCallback: Function, t
     extend_scrobbles_list(allScrobbles, recentTracks.track);
     // log(1, "page of", totalPages);
     let pagesDone = 1;
-    const prom = Array.from({length: totalPages - 1}, (_, i) => i + 2).map(async page => {
-        return get_all_scrobbles_page(username, page)
+    const prom = Array.from({length: totalPages - 1}, (_, i) => i + 2).map(page => {
+        return retry(() => get_all_scrobbles_page(username, page), 3)
         .then(val => {
             pagesDone++;
             pageLoadCallback();
-            // log(pagesDone, "pages of", totalPages);
             return val;
+        })
+        .catch(err => {
+            console.error(`Error fetching page ${page}: ${err}`);
         });
     });
     const all_promises = await Promise.all(prom);
